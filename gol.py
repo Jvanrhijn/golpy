@@ -17,9 +17,9 @@ class Grid:
             self._neighbors = self._neighbors_dead_boundary
 
     @classmethod
-    def init_random(cls, side):
+    def init_random(cls, side, periodic=False):
         grid = np.random.randint(0, high=2, size=(side, side))
-        return cls(grid)
+        return cls(grid, periodic=periodic)
 
     def evolve(self):
         # periodic boundary conditions
@@ -80,7 +80,7 @@ parser.add_argument(
     metavar='periodic',
     help='Whether to use periodic boundary conditions',
     type=bool,
-    default=False
+    default=True
 )
 
 
