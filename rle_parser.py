@@ -7,24 +7,28 @@ class Parser:
 
     def __init__(self, fpath):
         self._tags = {"b": 0, "o": 1}
-        comments = ["#N", "#C", "#O"]
+        comments = ["#N", "#C", "#c", "#O", "#P", "#R", "#r"]
         # Read actual lines from the RLE file
         self._lines = None
         with open(fpath, "r") as f:
             self._lines = list(filter(lambda line: line[:2] not in comments, f.readlines()))
-        # Split lines on $ and remove newline characters
-        self._lines = list(itertools.chain.from_iterable([line.rstrip().split('$') 
-            for line in self._lines]))
-        # Get dimensions
+        # get dimensions & strip header
         self._rows, self._columns = self._dimensions()
+        self._lines = self._lines[1:]
+        # concatenate all lines
+        self._lines = ''.join(list(itertools.chain.from_iterable([line.rstrip()
+            for line in self._lines])))
+        # Split lines on $
+        self._lines = self._lines.split('$') 
+        print(len(self._lines))
 
     def parse(self):
         grid = np.zeros((self._rows, self._columns))
         for i, line in enumerate(self._lines[1:]):
             if '!' in line:
-                line = ''.join(line.split('!')[:-1])  # Ignore everything after final '!'
+                line = line.split('!')[1]  # Ignore everything after final '!'
             grid[i, :] = self._array_from_line(line)
-        return grid
+        return np.array(grid)
 
     def _dimensions(self):
         """Returns tuple (rows, columns)"""
@@ -45,8 +49,3 @@ class Parser:
         output = list(itertools.chain.from_iterable(output)) 
         output += [0]*(self._columns - len(output))
         return np.array(output)
-
-
-if __name__ == "__main__":
-    print(Parser("test").parse())
-
