@@ -1,4 +1,5 @@
 import sys
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -58,14 +59,41 @@ def update(frame, grid, im):
     return im,
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        exit(1)
+parser = argparse.ArgumentParser(description="Conway's Game of Life (GOL) runner")
+parser.add_argument(
+    '--file',
+    dest='file',
+    metavar='file',
+    type=str,
+    help='Path to RLE file'
+)
+parser.add_argument(
+    '--rsize',
+    dest='size',
+    metavar='random grid size',
+    type=int,
+    help='Size of the game grid'
+)
+parser.add_argument(
+    '--periodic',
+    dest='periodic',
+    metavar='periodic',
+    help='Whether to use periodic boundary conditions',
+    type=bool,
+    default=False
+)
 
-    # initialize game of life
-    pattern = Parser(sys.argv[1]).parse()
-    grid = Grid(pattern, periodic=False)
-    #grid = Grid.init_random(int(sys.argv[1]))
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    
+    if args.file is not None:
+        pattern = Parser(args.file).parse()
+        grid = Grid(pattern, periodic=args.periodic)
+    elif args.size is not None:
+        grid = Grid.init_random(args.size, periodic=args.periodic)
+    else:
+        exit(1)
 
     # setup animation
     fig, ax = plt.subplots(1)

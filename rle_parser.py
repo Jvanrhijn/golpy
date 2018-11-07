@@ -20,7 +20,6 @@ class Parser:
             for line in self._lines])))
         # Split lines on $
         self._lines = self._lines.split('$') 
-        print(len(self._lines))
 
     def parse(self):
         grid = np.zeros((self._rows, self._columns))
